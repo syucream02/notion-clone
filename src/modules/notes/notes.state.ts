@@ -6,6 +6,7 @@ const notesAtom = atom<Note[]>([]);
 export const useNoteStore = () => {
   const [notes, setNotes] = useAtom(notesAtom);
   const getAll = () => notes;
+  const getOne = (id: number) => notes.find((note) => note.id === id);
   const set = (newNotes: Note[]) => {
     setNotes((oldNotes) => {
       const combineNotes = [...oldNotes, ...newNotes];
@@ -17,5 +18,22 @@ export const useNoteStore = () => {
       return Object.values(uniqueNotes);
     });
   };
-  return { getAll, set };
+  const deleteNote = (id: number) => {
+    const findChildrenIds = (parentId: number): number[] => {
+      const childrenIds = notes
+        .filter((note) => note.parentId == parentId)
+        .map((child) => child.id);
+      return childrenIds.concat(
+        ...childrenIds.map((childId) => findChildrenIds(childId)),
+      );
+    };
+
+    const childrenIds = findChildrenIds(id);
+    setNotes((oldNotes) =>
+      oldNotes.filter((note) => ![...childrenIds, id].includes(note.id)),
+    );
+  };
+  const clear = () => setNotes([]);
+
+  return { getAll, getOne, set, delete: deleteNote, clear };
 };

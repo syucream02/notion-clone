@@ -14,13 +14,34 @@ import {
 } from 'react-icons/fi';
 import Item from '../SideBar/Item';
 import type { Note } from '../../modules/notes/note.entity';
+import { useState } from 'react';
+import type { IconType } from 'react-icons';
 
 interface Props {
   note: Note;
-  onCreate?:(event: React.MouseEvent) => void;
+  onCreate?: (event: React.MouseEvent) => void;
+  onExpand?: (event: React.MouseEvent) => void;
+  layer?: number;
+  expanded?: boolean;
+  onClick: () => void;
+  onDelete?: (event: React.MouseEvent) => void;
 }
 
-export default function NoteItem({ note, onCreate }: Props) {
+export default function NoteItem({
+  note,
+  onCreate,
+  onExpand,
+  layer = 0,
+  expanded = false,
+  onClick,
+  onDelete,
+}: Props) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const getIcon = (): IconType => {
+    return expanded ? FiChevronDown : isHovered ? FiChevronRight : FiFile;
+  };
+
   const menu = (
     <div className="note-item-menu-container">
       <DropdownMenu>
@@ -35,7 +56,7 @@ export default function NoteItem({ note, onCreate }: Props) {
           side="right"
           forceMount
         >
-          <DropdownMenuItem onClick={() => {}}>
+          <DropdownMenuItem onClick={onDelete}>
             <FiTrash2 className="note-item-delete-icon" size={16} />
             Delete
           </DropdownMenuItem>
@@ -48,11 +69,18 @@ export default function NoteItem({ note, onCreate }: Props) {
   );
 
   return (
-    <div role="button" style={{ paddingLeft: '12px' }}>
+    <div
+      role="button"
+      style={{ paddingLeft: `${layer * 12 + 12}px` }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={onClick}
+    >
       <Item
         label={note.title ?? '無題'}
-        icon={FiChevronRight}
+        icon={getIcon()}
         trailingItem={menu}
+        onIconClick={onExpand}
       />
     </div>
   );
