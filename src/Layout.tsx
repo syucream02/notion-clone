@@ -8,8 +8,6 @@ import { useEffect, useState } from 'react';
 import { useNoteStore } from './modules/notes/notes.state';
 import { noteRepository } from './modules/notes/note.repository';
 import type { Note } from './modules/notes/note.entity';
-import { fa } from '@blocknote/core/locales';
-import { FaSliders } from 'react-icons/fa6';
 
 export default function Layout() {
   const currentUser = useAtomValue(currentUserAtom);
